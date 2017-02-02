@@ -4,29 +4,35 @@ max_k1=300;        %first hidden layer neurons
 max_k2=150;        %second hidden layer neurons
 max_n=10;          %output neurons
 
-in_vector=zeros(1,max_n);%input pattern
-hide1_vector=zeros(1,max_k1);%first hidden layer neurons
-hide2_vector=zeros(1,max_k2);%second hideden layer neurons
-out_vector=zeros(1,max_n);%output 
+% INPUT, HIDDEN LAYER x2, and OUTPUT ARRAYS
+in_vector=zeros(1,max_n);%input pattern, a 1x10 array of zeros
+hide1_vector=zeros(1,max_k1);%first hidden layer neurons, a 1x300 array of zeros
+hide2_vector=zeros(1,max_k2);%second hideden layer neurons, a 1x150 array of zeros
+out_vector=zeros(1,max_n);%output, a 1x10 array of zeros
 
-w0=randn(max_m,max_k1)*0.001;     %random weighto between input and first layer
-w1=randn(max_k1,max_k2)*0.001;    %random weight between first layer and sec layer
-w2=randn(max_k1,max_n)*0.001;      %random weight between output and second layer
-outmatrix=zeros(max_n,max_no_pat);
+% ARRAYS OF RANDOM WEIGHTS BETWEEN EACH LAYER
+w0=randn(max_m,max_k1)*0.001;     %random weighto between input and first layer, a 64x300 array of random numbers
+w1=randn(max_k1,max_k2)*0.001;    %random weight between first layer and sec layer, a 300x150 array of random numbers
+w2=randn(max_k1,max_n)*0.001;      %random weight between output and second layer, a 300x10 array of random numbers
+
+% OUTPUT MATRIX (INITIALIZED TO ZERO)
+outmatrix=zeros(max_n,max_no_pat);  % a 10x3823 array of zeros
+
+
 %*******************theta &neurons**********
-theta_h1=randn(1,max_k1)*0.001;
-theta_h2=randn(1,max_k2)*0.001;
-theta_o=randn(1,max_n)*0.001;
-hide1_neuron_out=zeros(1,max_k1);
-delta_ih=zeros(1,max_k1);
-hide2_neuron_out=zeros(1,max_k2);
-delta_hh=zeros(1,max_k2);
-y_out=zeros(max_n,max_no_pat);
-err=zeros(1,max_n);
-x=zeros(1,max_m);
-y=zeros(1,max_n);
-y_a=zeros(max_n,max_no_pat);
-d=0;
+theta_h1=randn(1,max_k1)*0.001;   % a 1 x #ofFirstHiddenNeurons array of random numbers (NOT SURE WHAT THETA MEANS HERE)
+theta_h2=randn(1,max_k2)*0.001;   % a 1 x #SecondHiddenNeurons array of random numbers
+theta_o=randn(1,max_n)*0.001;    % a 1 x #ofOutputNeurons array of random numbers
+hide1_neuron_out=zeros(1,max_k1);  %FirstHiddenLayer output array (zeros)
+delta_ih=zeros(1,max_k1);    % ????? Changes between theta_h1 and hide1_neuron_out  ?????
+hide2_neuron_out=zeros(1,max_k2);  %SecondHiddenLayer output array (zeros)
+delta_hh=zeros(1,max_k2);    % ????? Changes between theta_h2 and hide2_neuron_out  ?????
+y_out=zeros(max_n,max_no_pat);   %an array of zeros the same size as the output matrix
+err=zeros(1,max_n);   %an array of zeros the same size as the out_vector
+x=zeros(1,max_m);    %an array of zeros the same size as the number of input neurons (64)
+y=zeros(1,max_n);    %an array of zeros the same size as the number of output neurons (10)
+y_a=zeros(max_n,max_no_pat);    %a  10 x 3823 array of zeros
+d=0;    %???? What is d  ????
 delta_o=zeros(1,max_n);
 find_num=zeros(max_no_pat,10);
 %present
