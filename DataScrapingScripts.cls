@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ThisWorkbook"
+Attribute VB_Name = "ThisWorkbook1"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -27,17 +27,30 @@ End Sub
 
 Sub GetAvg()
 
+Dim segments As Integer
+
+segments = 6
+
+
 Dim count As Integer
 
 Dim segment_len As Integer
 
-Dim segments As Integer
-
 Dim total_rows As Long
 
-segments = 6
+Dim name As String
+
+Dim mode As Integer
+
+Dim student_num As Integer
 
 With ActiveWorkbook.ActiveSheet
+
+    name = .Cells(2, 1).Value
+
+    mode = Right(name, 1)
+    
+    student_num = Left(Right(name, 6), 1)
 
     total_rows = .Rows.count
     
@@ -45,7 +58,10 @@ With ActiveWorkbook.ActiveSheet
     
     segment_len = WorksheetFunction.RoundUp(count / segments, 0)
     
+    'temp
     .Range("B227").Value = segment_len
+    .Range("C227").Value = student_num
+    .Range("D227").Value = mode
     
     Dim segment As Range
     
@@ -73,3 +89,4 @@ With ActiveWorkbook.ActiveSheet
 End With
 
 End Sub
+
