@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-Sub RemoveRows()
+Sub RemoveRows(book As Workbook)
 
 Dim i As Integer
 
@@ -15,8 +15,10 @@ i = 1
 
 Do While i <= 500
 
-    If ActiveWorkbook.ActiveSheet.Range("H2").Value < "0.01" Then
-        ActiveWorkbook.ActiveSheet.Rows(2).EntireRow.Delete
+    If book.Worksheets(1).Range("H2").Value < "0.01" Then
+        book.Worksheets(1).Rows(2).EntireRow.Delete
+    Else
+        Exit Do
     End If
     
     i = i + 1
@@ -29,7 +31,7 @@ Sub GetAvg()
 
 Dim segments As Integer
 
-segments = 6
+segments = 5
 
 
 Dim count As Integer
@@ -44,49 +46,105 @@ Dim mode As Integer
 
 Dim student_num As Integer
 
-With ActiveWorkbook.ActiveSheet
+Dim database_file As Workbook
 
-    name = .Cells(2, 1).Value
+Set database_file = ThisWorkbook
 
-    mode = Right(name, 1)
-    
-    student_num = Left(Right(name, 6), 1)
+Dim dataset_base_row As Integer
 
-    total_rows = .Rows.count
+dataset_base_row = 2
+Dim k As Integer
+For k = 1 To Workbooks.count - 1
+
+    If Not Workbooks(k).name = database_file.name Then
     
-    count = WorksheetFunction.count(.Range(.Cells(2, 8), .Cells(total_rows, 8)))
-    
-    segment_len = WorksheetFunction.RoundUp(count / segments, 0)
-    
-    'temp
-    .Range("B227").Value = segment_len
-    .Range("C227").Value = student_num
-    .Range("D227").Value = mode
-    
-    Dim segment As Range
-    
-    Dim avg As Double
-    
-    Dim cols_to_avg As Variant
-                        
-    cols_to_avg = Array(8, 10, 15, 16, 17, 35)
-        '(Velocity, Lane Changing, Steering, Acceleration, Braking, Headway Distance)
-    
-    For j = 0 To UBound(cols_to_avg)
+        Dim book As Workbook
         
-        For i = 0 To segments - 1
+        Set book = Workbooks(k)
+                               
+        Call RemoveRows(book)
+    
+        With book.Worksheets(1)
         
-            Set segment = .Range(.Cells(2 + i * segment_len, cols_to_avg(j)), .Cells(1 + (i + 1) * segment_len, cols_to_avg(j)))
+            '**Get number and mode and add them to the database
+        
+            name = .Cells(2, 1).Value
+        
+            mode = Right(name, 1)
             
-            avg = WorksheetFunction.Average(segment)
+            student_num = Left(Right(name, 6), 1)
+            Dim j As Integer
+            For j = 0 To segments - 1
+            'Fill student num and mode
+                            
+                ThisWorkbook.Worksheets(1).Cells(j + dataset_base_row, 1) = "Student " + CStr(student_num)
+                
+                ThisWorkbook.Worksheets(1).Cells(j + dataset_base_row, 2) = mode
             
-            .Range("A228").Cells(i + 1, 1 + j) = avg
+            Next j
+        
+            '**Get results and add them to the database
+            'Dim result_address As Range
+            
+            'result_address = ThisWorkbook.Worksheets(2).Cells(1, 1)
+            
+            'For Each Row In ThisWorkbook.Worksheets(2).Rows
+            
+            '    If Row.Cells(1, 4).Value = "Student " + CStr(student_num) Then
+                
+            '        result_address = Row.Cells(3, 3)
                     
-        Next i
+            '        Exit For
+                
+            '    End If
+            
+            'Next Row
+            
+            
+
+            '**Get averages and add them to the database
+
+            total_rows = .Rows.count
+            
+            count = WorksheetFunction.count(.Range(.Cells(2, 8), .Cells(total_rows, 8)))
+            
+        End With
         
-    Next j
+        segment_len = WorksheetFunction.RoundUp(count / segments, 0)
+                    
+        
+        Dim cols_to_avg As Variant
+        cols_to_avg = Array(8, 10, 15, 16, 17, 35)
+            '(Velocity, Lane Changing, Steering, Acceleration, Braking, Headway Distance)
+        Dim col_addresses As Variant
+        col_addresses = Array(3, 12, 10, 9, 8, 11)
+        
+        For j = 0 To UBound(cols_to_avg)
+            Dim i As Integer
+            For i = 0 To segments - 1
+                
+                Dim segment As Range
     
-End With
+                Dim avg As Double
+    
+                With book.Worksheets(1)
+                    Set segment = .Range(.Cells(2 + i * segment_len, cols_to_avg(j)), .Cells(1 + (i + 1) * segment_len, cols_to_avg(j)))
+                End With
+                
+                avg = WorksheetFunction.Average(segment)
+                
+                database_file.Sheets("Sheet1").Cells(i + dataset_base_row, col_addresses(j)).Value = avg
+                        
+            Next i
+            
+        Next j
+                        
+    dataset_base_row = dataset_base_row + segments
+
+    End If
+        
+Next k
 
 End Sub
+
 
