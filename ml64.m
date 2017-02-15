@@ -4,67 +4,68 @@ max_k1=5;        %first hidden layer neurons
 max_n=5;          %output neurons
 
 % INPUT, HIDDEN LAYER x2, and OUTPUT ARRAYS
-in_vector=zeros(1,max_n);%input pattern, a 1x10 array of zeros
-hide1_vector=zeros(1,max_k1);%first hidden layer neurons, a 1x300 array of zeros
-
-out_vector=zeros(1,max_n);%output, a 1x10 array of zeros
+in_vector=zeros(1,max_n);
+hide1_vector=zeros(1,max_k1);
+out_vector=zeros(1,max_n);
 
 % ARRAYS OF RANDOM WEIGHTS BETWEEN EACH LAYER
-w0=randn(max_m,max_k1)*0.001;     %random weighto between input and first layer, a 64x300 array of random numbers
-
-w2=randn(max_k1,max_n)*0.001;      %random weight between output and second layer, a 300x10 array of random numbers
+w0=randn(max_m,max_k1)*0.001;   
+w2=randn(max_k1,max_n)*0.001;
 
 % OUTPUT MATRIX (INITIALIZED TO ZERO)
-outmatrix=zeros(max_n,max_no_pat);  % a 10x3823 array of zeros
+outmatrix=zeros(max_n,max_no_pat);  
 
+% THETA AND NEURONS
+theta_h1=randn(1,max_k1)*0.001;   
 
-%*******************theta &neurons**********
-theta_h1=randn(1,max_k1)*0.001;   % a 1 x #ofFirstHiddenNeurons array of random numbers (NOT SURE WHAT THETA MEANS HERE)
-
-theta_o=randn(1,max_n)*0.001;    % a 1 x #ofOutputNeurons array of random numbers
-hide1_neuron_out=zeros(1,max_k1);  %FirstHiddenLayer output array (zeros)
-delta_ih=zeros(1,max_k1);    % ????? Changes between theta_h1 and hide1_neuron_out  ?????
-
-delta_hh=zeros(1,max_k2);    % ????? Changes between theta_h2 and hide2_neuron_out  ?????
-y_out=zeros(max_n,max_no_pat);   %an array of zeros the same size as the output matrix
-err=zeros(1,max_n);   %an array of zeros the same size as the out_vector
-x=zeros(1,max_m);    %an array of zeros the same size as the number of input neurons (64)
-y=zeros(1,max_n);    %an array of zeros the same size as the number of output neurons (10)
-y_a=zeros(max_n,max_no_pat);    %a  10 x 3823 array of zeros
-d=0;    %???? What is d  ????
+theta_o=randn(1,max_n)*0.001;    
+hide1_neuron_out=zeros(1,max_k1);  
+delta_ih=zeros(1,max_k1);    
+y_out=zeros(max_n,max_no_pat);  
+err=zeros(1,max_n);   
+x=zeros(1,max_m);    
+y=zeros(1,max_n);    
+y_a=zeros(max_n,max_no_pat);    
+d=0;
 delta_o=zeros(1,max_n);
 find_num=zeros(max_no_pat,10);
-%present
+
+% PRESENT
 pw_ih=randn(max_m,max_k1)*0.001;ptheta_h1=randn(1,max_k1)*0.001;
-pw_hh=randn(max_k1,max_k2)*0.001;ptheta_h2=randn(1,max_k2)*0.001;
-pw_ho=randn(max_k2,max_n)*0.001;ptheta_o=randn(1,max_n)*0.001;
-%old
+pw_ho=randn(max_k1,max_n)*0.001;ptheta_o=randn(1,max_n)*0.001;
+
+% PAST
 old.w_ih=zeros(max_m,max_k1);old.theta_h1=zeros(1,max_k1);
-old.w_hh=zeros(max_k1,max_k2);old.theta_h2=zeros(1,max_k2);
-old.w_ho=zeros(max_k2,max_n);old.theta_o=zeros(1,max_n);
-%next
+old.w_ho=zeros(max_k1,max_n);old.theta_o=zeros(1,max_n);
+
+% FUTURE
 next.w_ih=zeros(max_m,max_k1);next.theta_h1=zeros(1,max_k1);
-next.w_hh=zeros(max_k1,max_k2);next.theta_h2=zeros(1,max_k2);
-next.w_ho=zeros(max_k2,max_n);next.theta_o=zeros(1,max_n);
+next.w_ho=zeros(max_k1,max_n);next.theta_o=zeros(1,max_n);
+
 g=randn(1,4);
-%eta ,alfa
+
+
+% ETA AND ALFA
 eta1=0.62;eta2=0.62;eta3=0.62;alfa=0.1;
-%**************main loop***********************
+
+
+% MAIN LOOP
 counter=0;
 for e=1:10
-            [m,n]=size(c);
+
+% WHERE THE OLD DATA BLOCK WAS (80%)
+
+[m,n]=size(c);
+
 cc=1;
 err_new=0;
       counter=counter+1;
       max_err=-10000;
-
-for l=1:1:max_no_pat %repeat for all pattern
-
-    
-for i=1:1:64  %read patern
-    x(1,i)=c(l,i);
-    
+        
 end 
+
+% WHERE THE OLD DATA BLOCK WAS (20%)
+
 d=c(1,65);  %y that expected
 y(1,d+1)=1;
 
