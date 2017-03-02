@@ -1,46 +1,52 @@
 
-max_m=4;         %input neurons
-max_k1=5;        %first hidden layer neurons
-max_n=5;          %output neurons
+input_neurons=4;         %input neurons
+hidden_neurons=5;        %first hidden layer neurons
+output_neurons=5;          %output neurons
 
 % INPUT, HIDDEN LAYER x2, and OUTPUT ARRAYS
-in_vector=zeros(1,max_n);
-hide1_vector=zeros(1,max_k1);
-out_vector=zeros(1,max_n);
+in_vector=zeros(1,output_neurons);
+hide1_vector=zeros(1,hidden_neurons);
+out_vector=zeros(1,output_neurons);
 
 % ARRAYS OF RANDOM WEIGHTS BETWEEN EACH LAYER
-w0=randn(max_m,max_k1)*0.001;   
-w2=randn(max_k1,max_n)*0.001;
+w0=randn(input_neurons,hidden_neurons)*0.001;   
+w2=randn(hidden_neurons,output_neurons)*0.001;
 
 % OUTPUT MATRIX (INITIALIZED TO ZERO)
-outmatrix=zeros(max_n,max_no_pat);  
+outmatrix=zeros(output_neurons,output_neuronso_pat);  
 
 % THETA AND NEURONS
-theta_h1=randn(1,max_k1)*0.001;   
+theta_h1=randn(1,hidden_neurons)*0.001;   
 
-theta_o=randn(1,max_n)*0.001;    
-hide1_neuron_out=zeros(1,max_k1);  
-delta_ih=zeros(1,max_k1);    
-y_out=zeros(max_n,max_no_pat);  
-err=zeros(1,max_n);   
-x=zeros(1,max_m);    
-y=zeros(1,max_n);    
-y_a=zeros(max_n,max_no_pat);    
+theta_o=randn(1,output_neurons)*0.001;    
+hide1_neuron_out=zeros(1,hidden_neurons);  
+delta_ih=zeros(1,hidden_neurons);    
+y_out=zeros(output_neurons,output_neuronso_pat);  
+err=zeros(1,output_neurons);   
+x=zeros(1,input_neurons);    
+y=zeros(1,output_neurons);    
+y_a=zeros(output_neurons,output_neuronso_pat);    
 d=0;
-delta_o=zeros(1,max_n);
-find_num=zeros(max_no_pat,10);
+delta_o=zeros(1,output_neurons);
+find_num=zeros(output_neuronso_pat,10);
 
 % PRESENT
-pw_ih=randn(max_m,max_k1)*0.001;ptheta_h1=randn(1,max_k1)*0.001;
-pw_ho=randn(max_k1,max_n)*0.001;ptheta_o=randn(1,max_n)*0.001;
+pw_ih=randn(input_neurons,hidden_neurons)*0.001;
+ptheta_h1=randn(1,hidden_neurons)*0.001;
+pw_ho=randn(hidden_neurons,output_neurons)*0.001;
+ptheta_o=randn(1,output_neurons)*0.001;
 
 % PAST
-old.w_ih=zeros(max_m,max_k1);old.theta_h1=zeros(1,max_k1);
-old.w_ho=zeros(max_k1,max_n);old.theta_o=zeros(1,max_n);
+old.w_ih=zeros(input_neurons,hidden_neurons);
+old.theta_h1=zeros(1,hidden_neurons);
+old.w_ho=zeros(hidden_neurons,output_neurons);
+old.theta_o=zeros(1,output_neurons);
 
 % FUTURE
-next.w_ih=zeros(max_m,max_k1);next.theta_h1=zeros(1,max_k1);
-next.w_ho=zeros(max_k1,max_n);next.theta_o=zeros(1,max_n);
+next.w_ih=zeros(input_neurons,hidden_neurons);
+next.theta_h1=zeros(1,hidden_neurons);
+next.w_ho=zeros(hidden_neurons,output_neurons);
+next.theta_o=zeros(1,output_neurons);
 
 g=randn(1,4);
 
@@ -72,9 +78,9 @@ y(1,d+1)=1;
 
 %work with present
 
-for j=1:1:max_k1 %compute input-neuron in first hidden layer
+for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
   neuron_input=0;
-    for i=1:1:max_m
+    for i=1:1:input_neurons
     neuron_input=neuron_input+x(1,i)*pw_ih(i,j);
     end
    neuron_input= neuron_input+ptheta_h1(j);
@@ -95,7 +101,7 @@ end
 %*****************************************************
 for j=1:1:max_k2 %compute input to neuronj in second hidden layer
   neuron_input=0;
-    for i=1:1:max_k1
+    for i=1:1:hidden_neurons
     neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_hh(i,j);
     end
    neuron_input= neuron_input+ptheta_h2(j);
@@ -114,7 +120,7 @@ for j=1:1:max_k2 %compute input to neuronj in second hidden layer
 end
 end
 %*********************************************
-for j=1:1:max_n %compute input to neuron j in output layer
+for j=1:1:output_neurons %compute input to neuron j in output layer
   neuron_input=0;
     for i=1:1:max_k2
     neuron_input=neuron_input+hide2_neuron_out(1,i)*pw_ho(i,j);
@@ -137,7 +143,7 @@ end
 end
 %*****************compute & save pattern error
  pat_err=err(1,1)*err(1,1);
-               for j=2:max_n 
+               for j=2:output_neurons 
                  pat_err=pat_err+err(1,j)*err(1,j);
                end
                
@@ -149,11 +155,11 @@ end
 %************* BACKPROPAGATE THE ERRORS***************
 
 %updating the weights between (second)hidden layer& output layer
- for j=1:1:max_n 
+ for j=1:1:output_neurons 
      delta_o(1,j)=y_a(j,l)*(1-y_a(j,l))*err(j);
  end
  
-  for j=1:1:max_n
+  for j=1:1:output_neurons
       
      for i=1:1:max_k2 
          next.w_ho(i,j)=pw_ho(i,j)+eta3*delta_o(1,j)*(hide2_neuron_out(1,i))+alfa*(pw_ho(i,j)-old.w_ho(i,j));
@@ -164,20 +170,20 @@ end
   %updating the weights between the first hidden-layer & the second
   for j=1:1:max_k2
        delta_hh(1,j)=0;
-       for  i=1:1:max_n
+       for  i=1:1:output_neurons
           delta_hh(1,j)=delta_hh(1,j)+delta_o(1,i)*pw_ho(j,i); 
        end%end for i
         delta_hh(1,j)=hide2_neuron_out(1,j)*(1-hide2_neuron_out(1,j))*delta_hh(1,j);
   end%end for j
   %*****************************update*********************
  for j=1:1:max_k2
-     for i=1:max_k1
+     for i=1:hidden_neurons
          next.w_hh(i,j)=pw_hh(i,j)+eta2*delta_hh(1,j)* hide1_neuron_out(1,i)+alfa*(pw_hh(i,j)-old.w_hh(i,j));
      end%end for i
      next.theta_h2(1,j)=theta_h2(1,j)+eta2*delta_hh(1,j)+alfa*(theta_h2(1,j)-old.theta_h2(1,j));
  end%end for j
  %updating the weights between input & first hidden layer
-  for j=1:1:max_k1
+  for j=1:1:hidden_neurons
        delta_ih(1,j)=0;
        for  i=1:max_k2 
            delta_ih(1,j)=delta_ih(1,j)+delta_hh(1,i)*pw_hh(j,i);
@@ -185,8 +191,8 @@ end
        delta_ih(1,j)=hide1_neuron_out(1,j)*(1-hide1_neuron_out(1,j))*delta_ih(1,j);
   end%end compute
   %start update
-  for j=1:1:max_k1
-       for i=1:1:max_m 
+  for j=1:1:hidden_neurons
+       for i=1:1:input_neurons 
            next.w_ih(i,j)=pw_ih(i,j)+eta1*delta_ih(1,j)*x(1,i)+alfa*(pw_ih(i,j)-old.w_ih(i,j));
        end
         next.theta_h1(1,j)=theta_h1(1,j)+eta1*delta_ih(1,j)+alfa*(theta_h1(1,j)-old.theta_h1(1,j));
@@ -207,7 +213,7 @@ ptheta_h2=next.theta_h2;
 ptheta_o=next.theta_o;
 %end of loop l read patern***********************
 end
-err_new=sqrt(err_new/max_no_pat);
+err_new=sqrt(err_new/output_neuronso_pat);
 err_new
 %end of loop e epoch
 end
@@ -231,9 +237,9 @@ y(1,d+1)=1;
 
 %work with present
 
-for j=1:1:max_k1 %compute input-neuron in first hidden layer
+for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
   neuron_input=0;
-    for i=1:1:max_m
+    for i=1:1:input_neurons
     neuron_input=neuron_input+x(1,i)*pw_ih(i,j);
     end
    neuron_input= neuron_input+ptheta_h1(j);
@@ -254,7 +260,7 @@ end
 %*****************************************************
 for j=1:1:max_k2 %compute input to neuronj in second hidden layer
   neuron_input=0;
-    for i=1:1:max_k1
+    for i=1:1:hidden_neurons
     neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_hh(i,j);
     end
    neuron_input= neuron_input+ptheta_h2(j);
@@ -273,7 +279,7 @@ for j=1:1:max_k2 %compute input to neuronj in second hidden layer
 end
 end
 %*********************************************
-for j=1:1:max_n %compute input to neuron j in output layer
+for j=1:1:output_neurons %compute input to neuron j in output layer
   neuron_input=0;
     for i=1:1:max_k2
     neuron_input=neuron_input+hide2_neuron_out(1,i)*pw_ho(i,j);
@@ -305,7 +311,7 @@ end
  
 pat_err=err(1,1)*err(1,1);
  
-               for j=2:max_n 
+               for j=2:output_neurons 
                  pat_err=pat_err+err(1,j)*err(1,j);
                end
                   %rond pat_ree
