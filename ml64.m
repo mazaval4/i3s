@@ -13,7 +13,7 @@ w0=randn(input_neurons,hidden_neurons)*0.001;
 w2=randn(hidden_neurons,output_neurons)*0.001;
 
 % OUTPUT MATRIX (INITIALIZED TO ZERO)
-outmatrix=zeros(output_neurons,output_neuronso_pat);  
+outmatrix=zeros(540,output_neurons); %all data points x number of output neurons  
 
 % THETA AND NEURONS
 theta_h1=randn(1,hidden_neurons)*0.001;   
@@ -21,7 +21,7 @@ theta_h1=randn(1,hidden_neurons)*0.001;
 theta_o=randn(1,output_neurons)*0.001;    
 hide1_neuron_out=zeros(1,hidden_neurons);  
 delta_ih=zeros(1,hidden_neurons);    
-y_out=zeros(output_neurons,output_neuronso_pat);  
+y_out=zeros(output_neurons,output_neurons); %useless  
 err=zeros(1,output_neurons);   
 x=zeros(1,input_neurons);    
 y=zeros(1,output_neurons);    
@@ -30,7 +30,7 @@ d=0;
 delta_o=zeros(1,output_neurons);
 find_num=zeros(output_neuronso_pat,10);
 
-% PRESENT
+% PRESENT WEIGHTS (pw)
 pw_ih=randn(input_neurons,hidden_neurons)*0.001;
 ptheta_h1=randn(1,hidden_neurons)*0.001;
 pw_ho=randn(hidden_neurons,output_neurons)*0.001;
@@ -48,11 +48,14 @@ next.theta_h1=zeros(1,hidden_neurons);
 next.w_ho=zeros(hidden_neurons,output_neurons);
 next.theta_o=zeros(1,output_neurons);
 
-g=randn(1,4);
+g=randn(1,4); %useless
 
 
 % ETA AND ALFA
-eta1=0.62;eta2=0.62;eta3=0.62;alfa=0.1;
+eta1=0.62;
+eta2=0.62;
+eta3=0.62;
+alfa=0.1;
 
 
 % MAIN LOOP
@@ -63,8 +66,8 @@ for e=1:10
 
 [m,n]=size(c);
 
-cc=1;
-err_new=0;
+cc=1; %useless
+err_new=0; %based on patterns, so useless
       counter=counter+1;
       max_err=-10000;
         
