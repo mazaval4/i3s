@@ -1,9 +1,10 @@
 
+% NEURONS 
 input_neurons=4;         %input neurons
 hidden_neurons=5;        %first hidden layer neurons
 output_neurons=5;          %output neurons
 
-% INPUT, HIDDEN LAYER x2, and OUTPUT ARRAYS
+% INPUT, HIDDEN LAYER, and OUTPUT ARRAYS
 in_vector=zeros(1,output_neurons);
 hide1_vector=zeros(1,hidden_neurons);
 out_vector=zeros(1,output_neurons);
@@ -13,22 +14,31 @@ w0=randn(input_neurons,hidden_neurons)*0.001;
 w2=randn(hidden_neurons,output_neurons)*0.001;
 
 % OUTPUT MATRIX (INITIALIZED TO ZERO)
-outmatrix=zeros(540,output_neurons); %all data points x number of output neurons  
+outmatrix=zeros(540,output_neurons); 
+%30 students * 18 data points = 540
 
-% THETA AND NEURONS
+% THETA
 theta_h1=randn(1,hidden_neurons)*0.001;   
+theta_o=randn(1,output_neurons)*0.001;
 
-theta_o=randn(1,output_neurons)*0.001;    
-hide1_neuron_out=zeros(1,hidden_neurons);  
-delta_ih=zeros(1,hidden_neurons);    
-y_out=zeros(output_neurons,output_neurons); %useless  
-err=zeros(1,output_neurons);   
+% HIDDEN LAYER OUTPUT    
+hide1_neuron_out=zeros(1,hidden_neurons);
+
+% HIDDEN LAYER DELTA: Difference between expected and calculated   
+delta_ih=zeros(1,hidden_neurons);
+
+% ERROR ARRAY
+err=zeros(1,output_neurons);
+
+% INPUT AND OUTPUT ARRAYS   
 x=zeros(1,input_neurons);    
-y=zeros(1,output_neurons);    
-y_a=zeros(output_neurons,output_neuronso_pat);    
+y=zeros(1,output_neurons);
+
+% (D)ESIRED OUTPUT VALUE
 d=0;
+
+% OUTPUT LAYER DELTA: Difference between expected and calculated
 delta_o=zeros(1,output_neurons);
-find_num=zeros(output_neuronso_pat,10);
 
 % PRESENT WEIGHTS (pw)
 pw_ih=randn(input_neurons,hidden_neurons)*0.001;
@@ -48,15 +58,11 @@ next.theta_h1=zeros(1,hidden_neurons);
 next.w_ho=zeros(hidden_neurons,output_neurons);
 next.theta_o=zeros(1,output_neurons);
 
-g=randn(1,4); %useless
-
-
 % ETA AND ALFA
 eta1=0.62;
 eta2=0.62;
 eta3=0.62;
 alfa=0.1;
-
 
 % MAIN LOOP
 counter=0;
@@ -66,8 +72,7 @@ for e=1:10
 
 [m,n]=size(c);
 
-cc=1; %useless
-err_new=0; %based on patterns, so useless
+
       counter=counter+1;
       max_err=-10000;
         
@@ -81,54 +86,52 @@ y(1,d+1)=1;
 
 %work with present
 
+% Start at 1, step by 1, and end at 5
 for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
-  neuron_input=0;
-    for i=1:1:input_neurons
-    neuron_input=neuron_input+x(1,i)*pw_ih(i,j);
-    end
+   
+   neuron_input=0;
+   
+   % Start at 1, step by 1, and end at 4
+   for i=1:1:input_neurons
+       % Multiply the input value by the hidden layer weight
+       neuron_input = neuron_input+x(1,i)*pw_ih(i,j);
+   end
+
+   % Add the hidden layer theta value
    neuron_input= neuron_input+ptheta_h1(j);
-   %factivation
+
+   % F ACTIVATION FUNCTION
    komak2=0;
+   % 1 and 0 indicate incorrect input
    if neuron_input < -30 
        komak2=0;
    else if neuron_input > 30 
-           komak2=1;
-       else
-         komak2=1/(1+exp(-1*neuron_input));
-       end
-   hide1_neuron_out(1,j)= komak2;
-   %********************** 
+       komak2=1;
+   else
+       komak2=1/(1+exp(-1*neuron_input));
+end
+
+   
+hide1_neuron_out(1,j)= komak2;
+%********************** 
    
 end
 end
 %*****************************************************
-for j=1:1:max_k2 %compute input to neuronj in second hidden layer
-  neuron_input=0;
-    for i=1:1:hidden_neurons
-    neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_hh(i,j);
-    end
-   neuron_input= neuron_input+ptheta_h2(j);
-   %factivation
-   komak2=0;
-   if neuron_input < -30 
-       komak2=0;
-   else if neuron_input > 30 
-           komak2=1;
-       else
-         komak2=1/(1+exp(-1*neuron_input));
-       end
-   hide2_neuron_out(1,j)= komak2;
-   %********************** 
    
-end
-end
-%*********************************************
-for j=1:1:output_neurons %compute input to neuron j in output layer
-  neuron_input=0;
-    for i=1:1:max_k2
-    neuron_input=neuron_input+hide2_neuron_out(1,i)*pw_ho(i,j);
+% Start at 1, step by 1, end at 5
+for j=1:1:output_neurons %compute input to output layer
+    neuron_input=0;
+    
+    % Start at 1, step by 1, end at # of hidden neurons
+    for i=1:1:hidden_neurons    
+     % Multiply hidden output by weight
+     neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
     end
-   neuron_input= neuron_input+ptheta_o(j);
+
+    % Add output theta value
+    neuron_input= neuron_input+ptheta_o(j);
+   
    %factivation
    komak2=0;
    if neuron_input < -30 
