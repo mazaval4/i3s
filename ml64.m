@@ -58,7 +58,7 @@ next.theta_h1=zeros(1,hidden_neurons);
 next.w_ho=zeros(hidden_neurons,output_neurons);
 next.theta_o=zeros(1,output_neurons);
 
-% ETA AND ALFA
+% ETA AND ALFA (ALPHA?)
 eta1=0.62;
 eta2=0.62;
 eta3=0.62;
@@ -86,15 +86,19 @@ y(1,d+1)=1;
 
 %work with present
 
+% COMPUTING INPUT FOR HIDDEN LAYER
+
 % Start at 1, step by 1, and end at 5
-for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
+for j=1:1:hidden_neurons
    
    neuron_input=0;
    
    % Start at 1, step by 1, and end at 4
    for i=1:1:input_neurons
+
        % Multiply the input value by the hidden layer weight
        neuron_input = neuron_input+x(1,i)*pw_ih(i,j);
+
    end
 
    % Add the hidden layer theta value
@@ -111,7 +115,8 @@ for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
        komak2=1/(1+exp(-1*neuron_input));
 end
 
-   
+% SETTING THE OUTPUTS OF THE HIDDEN LAYER
+
 hide1_neuron_out(1,j)= komak2;
 %********************** 
    
@@ -119,45 +124,45 @@ end
 end
 %*****************************************************
    
+% COMPUTING THE INPUT FOR THE OUTPUT LAYER
+
 % Start at 1, step by 1, end at 5
 for j=1:1:output_neurons %compute input to output layer
     neuron_input=0;
     
     % Start at 1, step by 1, end at # of hidden neurons
-    for i=1:1:hidden_neurons    
+    for i=1:1:hidden_neurons
+    
      % Multiply hidden output by weight
      neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
+
     end
 
     % Add output theta value
     neuron_input= neuron_input+ptheta_o(j);
    
-   %factivation
+   %factivation (same as previous)
    komak2=0;
    if neuron_input < -30 
        komak2=0;
    else if neuron_input > 30 
-           komak2=1;
-       else
-         komak2=1/(1+exp(-1*neuron_input));
-       end
+       komak2=1;
+   else
+       komak2=1/(1+exp(-1*neuron_input));
+   end
+
+   % Y = OUTPUT, A = ACTIVATION ? NOT SURE
    y_a(j,l)= komak2;
+
+   % Error = desired (y) - calculated (y_a)
    err(1,j)=y(1,j)-y_a(j,l);
+   % Perhaps we should change this to be a % difference equation
+
    %********************** 
    
 end
 end
-%*****************compute & save pattern error
- pat_err=err(1,1)*err(1,1);
-               for j=2:output_neurons 
-                 pat_err=pat_err+err(1,j)*err(1,j);
-               end
-               
-               err_new=err_new +pat_err;
-               if pat_err>max_err 
-                   max_err=pat_err;
-                   Max_idx=l;
-               end;
+
 %************* BACKPROPAGATE THE ERRORS***************
 
 %updating the weights between (second)hidden layer& output layer
@@ -173,6 +178,8 @@ end
         next.theta_o(1,j)=ptheta_o(1,j)+eta3*delta_o(1,j)+alfa*(ptheta_o(1,j)-old.theta_o(1,j));
      
   end  %end for j
+
+
   %updating the weights between the first hidden-layer & the second
   for j=1:1:max_k2
        delta_hh(1,j)=0;
@@ -181,6 +188,8 @@ end
        end%end for i
         delta_hh(1,j)=hide2_neuron_out(1,j)*(1-hide2_neuron_out(1,j))*delta_hh(1,j);
   end%end for j
+
+
   %*****************************update*********************
  for j=1:1:max_k2
      for i=1:hidden_neurons
@@ -204,6 +213,8 @@ end
         next.theta_h1(1,j)=theta_h1(1,j)+eta1*delta_ih(1,j)+alfa*(theta_h1(1,j)-old.theta_h1(1,j));
        
   end%end j
+
+
   %change present past next
 old.w_ih=pw_ih;
 old.w_hh=pw_hh;
@@ -219,13 +230,11 @@ ptheta_h2=next.theta_h2;
 ptheta_o=next.theta_o;
 %end of loop l read patern***********************
 end
-err_new=sqrt(err_new/output_neuronso_pat);
-err_new
 %end of loop e epoch
 end
 [m1,n1]=size(ct);
 cc=1;
-err_new=0;
+
 
       counter=counter+1;
       max_err=-10000;
@@ -234,12 +243,13 @@ compare=zeros(300,21);
 for l=1:1:300 %repeat for 300 pattern for test
 
     
-for i=1:1:64  %read patern
-    x(1,i)=ct(l,i);
-   
-end 
 d=ct(l,65);  %y that expected
 y(1,d+1)=1;
+
+
+% THIS NEXT PART LOOKS LIKE ITS BEEN COPY/PASTED 
+% (MAY NOT BE NECESSARY)
+
 
 %work with present
 
@@ -313,29 +323,6 @@ for j=1:1:output_neurons %compute input to neuron j in output layer
 end
 end
 
-%*****************compute & save pattern error
- 
-pat_err=err(1,1)*err(1,1);
- 
-               for j=2:output_neurons 
-                 pat_err=pat_err+err(1,j)*err(1,j);
-               end
-                  %rond pat_ree
-   if pat_err>=1
-      pat_err=1;
-   else
-       pat_err=0;
-   end
-               err_new=err_new +pat_err;
-               if pat_err>max_err 
-                   max_err=pat_err;
-                   Max_idx=l;
-               end
- 
-                         
-end
-              err_new=sqrt(err_new/300);
-err_new
 
 
       
