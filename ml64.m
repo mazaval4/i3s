@@ -105,14 +105,8 @@ for j=1:1:hidden_neurons
    neuron_input= neuron_input+ptheta_h1(j);
 
    % F ACTIVATION FUNCTION
-   komak2=0;
-   % 1 and 0 indicate incorrect input
-   if neuron_input < -30 
-       komak2=0;
-   else if neuron_input > 30 
-       komak2=1;
-   else
-       komak2=1/(1+exp(-1*neuron_input));
+   komak2=0;       
+   komak2=1/(1+exp(-1*neuron_input));
 end
 
 % SETTING THE OUTPUTS OF THE HIDDEN LAYER
@@ -143,12 +137,7 @@ for j=1:1:output_neurons %compute input to output layer
    
    %factivation (same as previous)
    komak2=0;
-   if neuron_input < -30 
-       komak2=0;
-   else if neuron_input > 30 
-       komak2=1;
-   else
-       komak2=1/(1+exp(-1*neuron_input));
+   komak2=1/(1+exp(-1*neuron_input));
    end
 
    % Y = OUTPUT, A = ACTIVATION ? NOT SURE
