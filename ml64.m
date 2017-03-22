@@ -63,7 +63,10 @@ eta2=0.62;
 eta3=0.62;
 alfa=0.1;
 
+activation_output;
 %work with present
+
+%for each data point (line in the database), do the following
 
 % COMPUTING INPUT FOR HIDDEN LAYER
 
@@ -84,12 +87,12 @@ for j=1:1:hidden_neurons
    neuron_input= neuron_input+ptheta_h1(j);
 
    % F ACTIVATION FUNCTION
-   komak2=1/(1+exp(-1*neuron_input));
+   activation_output=1/(1+exp(-1*neuron_input));
 end
 
 % SETTING THE OUTPUTS OF THE HIDDEN LAYER
 
-hide1_neuron_out(1,j)= komak2;
+hide1_neuron_out(1,j)= activation_output;
 %********************** 
 %*****************************************************
    
@@ -111,24 +114,43 @@ for j=1:1:output_neurons %compute input to output layer
     neuron_input= neuron_input+ptheta_o(j);
    
     %factivation (same as previous)
-    komak2=1/(1+exp(-1*neuron_input));
+    activation_output=1/(1+exp(-1*neuron_input));
 end
 
 % Y = OUTPUT, A = ACTIVATION ? NOT SURE
-y_a(j,l)= komak2;
+y_a(j,l)= activation_output;
 
 % Error = desired (y) - calculated (y_a)
-err(1,j)=y(1,j)-y_a(j,l);
+err_o(1,j)=y(1,j)-y_a(j,l);
 % Perhaps we should change this to be a % difference equation
 
 %********************** 
-   
+
+
+
 %************* BACKPROPAGATE THE ERRORS***************
 
+delta_1(1,hidden_neurons);
+
+%this is between output and hidden layer
+for j=1:1:output_neurons
+	delta_1(1,j) = err_o(1,j) * pw_ho(1,j);
+end
+
+
+%this is between hidden and input
+for j=1:1:hidden_neurons
+	delta_2(1,j) = delta_1 * pw_ih(1,j);
+end
+
+
+
+%----------------------------
+	
 %updating the weights between (second)hidden layer& output layer
 for j=1:1:output_neurons 
      delta_o(1,j)=y_a(j,l)*(1-y_a(j,l))*err(j);
- end
+end
  
 for j=1:1:output_neurons
       
@@ -142,7 +164,7 @@ end  %end for j
 
 
 %updating the weights between the first hidden-layer & the second
-for j=1:1:max_k2
+for j=1:1:output_neurons
        delta_hh(1,j);
        for  i=1:1:output_neurons
           delta_hh(1,j)=delta_hh(1,j)+delta_o(1,i)*pw_ho(j,i); 
@@ -224,15 +246,15 @@ y(1,d+1)=1;
         end
         neuron_input= neuron_input+ptheta_h1(j);
         %factivation
-        komak2=0;
+        activation_output=0;
         if neuron_input < -30 
-        komak2=0;
+        activation_output=0;
         elseif neuron_input > 30 
-            komak2=1;
+            activation_output=1;
             else
-                komak2=1/(1+exp(-1*neuron_input));
+                activation_output=1/(1+exp(-1*neuron_input));
         end
-        hide1_neuron_out(1,j)= komak2;
+        hide1_neuron_out(1,j)= activation_output;
         %********************** 
     end
 end
@@ -244,15 +266,15 @@ for j=1:1:max_k2 %compute input to neuronj in second hidden layer
     end
    neuron_input= neuron_input+ptheta_h2(j);
    %factivation
-   komak2;
+   activation_output;
    if neuron_input < -30 
-       komak2=0;
+       activation_output=0;
    elseif neuron_input > 30 
-           komak2=1;
+           activation_output=1;
        else
-         komak2=1/(1+exp(-1*neuron_input));
+         activation_output=1/(1+exp(-1*neuron_input));
    end
-   hide2_neuron_out(1,j)= komak2;
+   hide2_neuron_out(1,j)= activation_output;
    %********************** 
    
 end
@@ -264,15 +286,15 @@ for j=1:1:output_neurons %compute input to neuron j in output layer
     end
    neuron_input= neuron_input+ptheta_o(j);
    %factivation
-   komak2;
+   activation_output;
    if neuron_input < -30 
-       komak2=0;
+       activation_output=0;
    elseif neuron_input > 30 
-           komak2=1;
+           activation_output=1;
        else
-         komak2=1/(1+exp(-1*neuron_input));
+         activation_output=1/(1+exp(-1*neuron_input));
    end
-   y_a(j,l)= komak2;
+   y_a(j,l)= activation_output;
      %rond y_a
    if y_a(j,1)>0.5
        y_a(j,1)=1;
