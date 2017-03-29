@@ -1,3 +1,6 @@
+% EXCEL DATABASE JUNNK
+data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
+
 % NEURONS 
 input_neurons=4;         %input neurons
 hidden_neurons=5;        %first hidden layer neurons
@@ -64,7 +67,7 @@ eta3=0.62;
 alfa=0.1;
 learning_rate=0.69;
 
-activation_output;
+activation_output; %*****************************************************Fix this, its an error
 %work with present
 
 %for each data point (line in the database), do the following
