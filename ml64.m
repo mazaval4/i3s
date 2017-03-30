@@ -122,6 +122,8 @@ for j=1:1:output_neurons %compute input to output layer
 end
 
 % Y = OUTPUT, A = ACTIVATION ? NOT SURE
+%l will be replaced later with a for loop variable
+%for now it is an error
 y_a(j,l)= activation_output;
 
 % Error = desired (y) - calculated (y_a)
@@ -137,6 +139,8 @@ delta_output(1,j)=y(1,j)-y_a(j,l);
 % delta_input = zeros(1,input_neurons);
 delta_hidden = zeros(1,hidden_neurons);
 %************Getting Hidden Layer Deltas
+%for now this does not work because the l is not defined yet. see
+%above comment for reference
 for k=1:1:hidden_neurons
     delta_sum = 0;
     for n=1:1:output_neurons
@@ -157,6 +161,7 @@ end
 %************************Replace diff with symbolic eq*********************
 %*************************************************************************
 %******Updating Weights between input and hidden layer
+%database input give it an error for now until we link the database
 for k = 1: 1: hidden_neurons
     for n = 1: 1: input_neurons
         next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*diff(1/(1+exp(-1*hide1_neuron_out(1,k) )))*database_input;
@@ -164,6 +169,8 @@ for k = 1: 1: hidden_neurons
 end
 
 %******Updating Weights between hidden layer and output
+%Check this late, throws an error
+%Subscripted assignment dimension mismatch.
 for k = 1: 1: output_neurons
     for n = 1: 1: hidden_neurons
         next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*diff(1/(1+exp(-1*neuron_input)))*hide1_neuron_out(1,n);
