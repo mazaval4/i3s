@@ -1,4 +1,5 @@
 % EXCEL DATABASE JUNNK
+% Talab Hussein
 data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
 
 % NEURONS 
