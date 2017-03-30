@@ -67,7 +67,8 @@ eta3=0.62;
 alfa=0.1;
 learning_rate=0.69;
 
-activation_output; %*****************************************************Fix this, its an error
+activation_output =; 
+%*****************************************************Fix this, its an error
 %work with present
 
 %for each data point (line in the database), do the following
@@ -97,7 +98,7 @@ end
 % SETTING THE OUTPUTS OF THE HIDDEN LAYER
 
 hide1_neuron_out(1,j)= activation_output;
-%********************** 
+
 %*****************************************************
    
 % COMPUTING THE INPUT FOR THE OUTPUT LAYER
@@ -128,8 +129,6 @@ y_a(j,l)= activation_output;
 
 % Error = desired (y) - calculated (y_a)
 delta_output(1,j)=y(1,j)-y_a(j,l);
-% Perhaps we should change this to be a % difference equation
-
 %********************** 
 
 
@@ -157,9 +156,11 @@ end
 %     delta_input(1,k)= delta_sum;
 % end
 
-%*************************************************************************
-%************************Replace diff with symbolic eq*********************
-%*************************************************************************
+
+
+%************Replace diff with symbolic eq*****************
+
+
 %******Updating Weights between input and hidden layer
 %database input give it an error for now until we link the database
 for k = 1: 1: hidden_neurons
@@ -177,163 +178,95 @@ for k = 1: 1: output_neurons
     end
 end
 
-%----------------------------
+%******Make the present weights, the Next weights********
+
+pw_ih = next.w_ih;
+pw_oh = next.w_oh;
+
+%----------------------------------------------------------
+
+%******************* TESTING *******************
+
+total_percent_error = 0;
+
+% COMPUTING INPUT FOR HIDDEN LAYER
+
+% Start at 1, step by 1, and end at 5
+for j=1:1:hidden_neurons
+   
+   neuron_input=0;
+   
+   % Start at 1, step by 1, and end at 4
+   for i=1:1:input_neurons
+
+       % Multiply the input value by the hidden layer weight
+       neuron_input = neuron_input+x(1,i)*pw_ih(i,j);
+
+   end
+
+   % Add the hidden layer theta value
+   neuron_input= neuron_input+ptheta_h1(j);
+
+   % F ACTIVATION FUNCTION
+   activation_output=1/(1+exp(-1*neuron_input));
+end
+
+% SETTING THE OUTPUTS OF THE HIDDEN LAYER
+
+hide1_neuron_out(1,j)= activation_output;
+   
+%********* COMPUTING THE INPUT FOR THE OUTPUT LAYER *****
+
+% Start at 1, step by 1, end at 5
+for j=1:1:output_neurons %compute input to output layer
+    neuron_input=0;
+    
+    % Start at 1, step by 1, end at # of hidden neurons
+    for i=1:1:hidden_neurons
+    
+    % Multiply hidden output by weight
+    neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
+
+    end
+
+    % Add output theta value
+    neuron_input= neuron_input+ptheta_o(j);
+   
+    %factivation (same as previous)
+    activation_output=1/(1+exp(-1*neuron_input));
+end
+
+% Y = OUTPUT, A = ACTIVATION ? NOT SURE
+y_a(j,l)= activation_output;
+
+% Error = desired (y) - calculated (y_a)
+delta_output(1,j)=y(1,j)-y_a(j,l);
+% Perhaps we should change this to be a % difference equation
+
+%percent_error=the absolute value of calc - desired/desired *100
+percent_error = abs( ( y_a(j,l) - y(1,j) ) / y(1,j) ) * 100;
+fprintf('Percent Error: %0.2f\n', percent_error);   
+
+
+% Add all deltas 
+for h=1:1:output_neurons
+	total_percent_error = total_percent_error + delta_output;
+end
+
+
+% After the testing loop...
+% get the average percent error
+average_percent_error = total_percent_error / 108;
+fprintf('Total Percent Error: %0.2f\n', average_percent_error);   
+
 	
-        % %updating the weights between (second)hidden layer& output layer
-        % for j=1:1:output_neurons 
-        %      delta_o(1,j)=y_a(j,l)*(1-y_a(j,l))*delta_output(j);
-        % end
-        %  
-        % for j=1:1:output_neurons
-        %       
-        %      for i=1:1:max_k2 
-        %          next.w_ho(i,j)=pw_ho(i,j)+eta3*delta_o(1,j)*(hide2_neuron_out(1,i))+alfa*(pw_ho(i,j)-old.w_ho(i,j));
-        %      end
-        %      
-        %      next.theta_o(1,j)=ptheta_o(1,j)+eta3*delta_o(1,j)+alfa*(ptheta_o(1,j)-old.theta_o(1,j));
-        %      
-        % end  %end for j
-        % 
-        % 
-        % %updating the weights between the first hidden-layer & the second
-        % for j=1:1:output_neurons
-        %        delta_hh(1,j);
-        %        for  i=1:1:output_neurons
-        %           delta_hh(1,j)=delta_hh(1,j)+delta_o(1,i)*pw_ho(j,i); 
-        %        end%end for i
-        %         delta_hh(1,j)=hide2_neuron_out(1,j)*(1-hide2_neuron_out(1,j))*delta_hh(1,j);
-        % end  %end for j
-        % 
-        % 
-        %   %*****************************update*********************
-        % for j=1:1:max_k2
-        % 	for i=1:hidden_neurons
-        %         next.w_hh(i,j)=pw_hh(i,j)+eta2*delta_hh(1,j)* hide1_neuron_out(1,i)+alfa*(pw_hh(i,j)-old.w_hh(i,j));
-        %     end %end for i
-        %     
-        %     next.theta_h2(1,j)=theta_h2(1,j)+eta2*delta_hh(1,j)+alfa*(theta_h2(1,j)-old.theta_h2(1,j));
-        % end %end for j
-        % 
-        % %updating the weights between input & first hidden layer
-        % 
-        % for j=1:1:hidden_neurons
-        %        delta_ih(1,j)=0;
-        %        for  i=1:max_k2 
-        %            delta_ih(1,j)=delta_ih(1,j)+delta_hh(1,i)*pw_hh(j,i);
-        %        end
-        %        delta_ih(1,j)=hide1_neuron_out(1,j)*(1-hide1_neuron_out(1,j))*delta_ih(1,j);
-        % end %end compute
-        % %start update
-        % 
-        % for j=1:1:hidden_neurons
-        %     for i=1:1:input_neurons 
-        %     	next.w_ih(i,j)=pw_ih(i,j)+eta1*delta_ih(1,j)*x(1,i)+alfa*(pw_ih(i,j)-old.w_ih(i,j));
-        %     end
-        %     
-        %     next.theta_h1(1,j)=theta_h1(1,j)+eta1*delta_ih(1,j)+alfa*(theta_h1(1,j)-old.theta_h1(1,j));
-        %        
-        % end %end j
-
-
-  %change present past next
-old.w_ih=pw_ih;
-old.w_hh=pw_hh;
-old.w_ho=pw_ho;
-old.theta_h1=ptheta_h1;
-old.theta_h2=ptheta_h2;
-old.theta_o=ptheta_o;
+        
 pw_ih=next.w_ih;
 pw_hh=next.w_hh;
 pw_ho=next.w_ho;
+
+%Should the bias change? I thought it was supposed to be const.
 ptheta_h1=next.theta_h1;
 ptheta_h2=next.theta_h2;
 ptheta_o=next.theta_o;
 
-
-[m1,n1]=size(ct);
-cc=1;
-
-
-      counter=counter+1;
-      max_err=-10000;
-compare=zeros(300,21);
-
-for l=1:1:300 %repeat for 300 pattern for test
-
-    
-d=ct(l,65);  %y that expected
-y(1,d+1)=1;
-
-
-% THIS NEXT PART LOOKS LIKE ITS BEEN COPY/PASTED 
-% (MAY NOT BE NECESSARY)
-
-
-%work with present
-
-    for j=1:1:hidden_neurons %compute input-neuron in first hidden layer
-        neuron_input=0;
-        for i=1:1:input_neurons
-            neuron_input=neuron_input+x(1,i)*pw_ih(i,j);
-        end
-        neuron_input= neuron_input+ptheta_h1(j);
-        %factivation
-        activation_output=0;
-        if neuron_input < -30 
-        activation_output=0;
-        elseif neuron_input > 30 
-            activation_output=1;
-            else
-                activation_output=1/(1+exp(-1*neuron_input));
-        end
-        hide1_neuron_out(1,j)= activation_output;
-        %********************** 
-    end
-end
-%*****************************************************
-for j=1:1:max_k2 %compute input to neuronj in second hidden layer
-  neuron_input=0;
-    for i=1:1:hidden_neurons
-        neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_hh(i,j);
-    end
-   neuron_input= neuron_input+ptheta_h2(j);
-   %factivation
-   activation_output;
-   if neuron_input < -30 
-       activation_output=0;
-   elseif neuron_input > 30 
-           activation_output=1;
-       else
-         activation_output=1/(1+exp(-1*neuron_input));
-   end
-   hide2_neuron_out(1,j)= activation_output;
-   %********************** 
-   
-end
-%*********************************************
-for j=1:1:output_neurons %compute input to neuron j in output layer
-  neuron_input=0;
-    for i=1:1:max_k2
-    neuron_input=neuron_input+hide2_neuron_out(1,i)*pw_ho(i,j);
-    end
-   neuron_input= neuron_input+ptheta_o(j);
-   %factivation
-   activation_output;
-   if neuron_input < -30 
-       activation_output=0;
-   elseif neuron_input > 30 
-           activation_output=1;
-       else
-         activation_output=1/(1+exp(-1*neuron_input));
-   end
-   y_a(j,l)= activation_output;
-     %rond y_a
-   if y_a(j,1)>0.5
-       y_a(j,1)=1;
-   else
-       y_a(j,1)=0;
-   end
-   delta_output(1,j)=y(1,j)-y_a(j,l);
-   %********************** 
-   
-end
