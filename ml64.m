@@ -48,7 +48,7 @@ eta1=0.62;
 eta2=0.62;
 eta3=0.62;
 alfa=0.1;
-learning_rate=0.69;
+learning_rate=0.39;
 
 activation_output = 0; 
 %*****************************************************Fix this, its an error
@@ -63,9 +63,9 @@ training_rows = .80 * total_rows;
 while current_row <= training_rows
 
 	%Load data into temporary input and output arrays
-	for i=2:1:5
+	for i=2:1:6
 		in_vector(1,i-1) = data(current_row, i);
-		out_vector(1,i-1) = data(current_row, (i+6));
+		out_vector(1,i-1) = data(current_row, (i+5));
 	end
 
 	%*********** COMPUTING INPUT FOR HIDDEN LAYER *************
@@ -88,12 +88,10 @@ while current_row <= training_rows
 
 	   % F ACTIVATION FUNCTION
 	   activation_output=1/(1+exp(-1*neuron_input));
-	end
-
-	%SETTING THE OUTPUTS OF THE HIDDEN LAYER
-
-	hide1_neuron_out(1,j)= activation_output;
-
+       
+       %SETTING THE OUTPUTS OF THE HIDDEN LAYER
+       hide1_neuron_out(1,j)= activation_output;
+    end
 
 	%********* COMPUTING THE INPUT FOR THE OUTPUT LAYER ************
 
@@ -127,52 +125,55 @@ while current_row <= training_rows
 		delta_sum = 0;
 		for n=1:1:output_neurons
 			delta_sum = delta_sum + delta_output(1,n) * pw_ho(k,n);
-            fprintf("delta_output: %f\n", delta_output(1,n));
 		end
 		delta_hidden(1,k)= delta_sum;
 	end
 
 
 	%************Replace diff with symbolic eq*****************
-
-
+    
+    syms x;
+    f(x) = 1/(1+exp(-1*x));
+    df = diff(f,x);
+            
 	%******Updating Weights between input and hidden layer
 	for k = 1: 1: hidden_neurons
         for n = 1: 1: input_neurons
-            fprintf("delta_hidden(1,n): %f\n", delta_hidden(1,n));
-			next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*diff(1/(1+exp(-1*hide1_neuron_out(1,k) )))*in_vector(1, n);
+            x = hide1_neuron_out(1,k);
+			next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*df(x)*in_vector(1, n);
 		end
 	end
 
 	%******Updating Weights between hidden layer and output
 	%Check this late, throws an error
 	%Subscripted assignment dimension mismatch.
-	for k = 1: 1: output_neurons
+    x = neuron_input;
+
+    for k = 1: 1: output_neurons
 		for n = 1: 1: hidden_neurons
-			next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*diff(1/(1+exp(-1*neuron_input)))*hide1_neuron_out(1,n);
+			next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*df(x)*hide1_neuron_out(1,n);
 		end
 	end
 
 	
 	%******Make the present weights, the Next weights********
 	pw_ih = next.w_ih;
-	pw_oh = next.w_oh;
+	pw_oh = next.w_ho;
 
 	% Increment the row
 	current_row = current_row + 1;
-	
+	fprintf("%d\n", current_row);
 end
 
 
 % TESTING LOOP
-while current_row <= total_rows
+while current_row < total_rows
 
 	%Load data like before
-	for i=1:1:5
-		in_vector(1,i) = data(current_row, i);
-		out_vector(1,i) = data(current_row, (i+5));
-	end
-	
+	for i=2:1:6
+		in_vector(1,i-1) = data(current_row, i);
+		out_vector(1,i-1) = data(current_row, (i+5));
+    end
 	
 	%******************* TESTING *******************
 
@@ -221,22 +222,22 @@ while current_row <= total_rows
 		% Add output theta value
 		neuron_input= neuron_input+ptheta_o(j);
 	   
-		%factivation (same as previous)
+		% activation (same as previous)
 		activation_output=1/(1+exp(-1*neuron_input));
 
 		% Error = desired (y) - calculated (y_a)
 		delta_output(1,j)=out_vector(1,j)-activation_output;
 
-		%percent_error=the absolute value of (calc - desired)/desired *100
-		percent_error = abs( (activation_output - out_vector(1,j) ) / out_vector(1,j) ) * 100;
-		fprintf('Percent Error: %0.2f\n', percent_error);   
-
-
-		total_percent_error = total_percent_error + percent_error;
+        if out_vector(1,j) ~= 0
+            % percent_error=the absolute value of (calc - desired)/desired *100
+            percent_error = abs( (activation_output - out_vector(1,j) ) / out_vector(1,j) ) * 100;
+            fprintf('Percent Error: %0.2f\n', percent_error);
+            total_percent_error = total_percent_error + percent_error;
+        end
 	end
 
 	current_row = current_row + 1;
-	
+	fprintf("%d\n", current_row);
 end
 	
 	
