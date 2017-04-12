@@ -43,12 +43,8 @@ next.theta_h1=zeros(1,hidden_neurons);
 next.w_ho=zeros(hidden_neurons,output_neurons);
 next.theta_o=zeros(1,output_neurons);
 
-% ETA AND ALFA (ALPHA?)
-eta1=0.62;
-eta2=0.62;
-eta3=0.62;
-alfa=0.1;
-learning_rate=0.39;
+
+learning_rate=.2;
 
 activation_output = 0; 
 %*****************************************************Fix this, its an error
@@ -162,7 +158,7 @@ while current_row <= training_rows
 
 	% Increment the row
 	current_row = current_row + 1;
-	fprintf("%d\n", current_row);
+	fprintf('%d\n', current_row);
 end
 
 
@@ -237,11 +233,11 @@ while current_row < total_rows
 	end
 
 	current_row = current_row + 1;
-	fprintf("%d\n", current_row);
+	fprintf('%d\n', current_row);
 end
 	
 	
 % After the testing loop...
 % get the average percent error: the total percent error divided by 1/5th of the 525 total points
-average_percent_error = total_percent_error / 105;
+average_percent_error = total_percent_error / 105*5;
 fprintf('Total Percent Error: %0.2f\n', average_percent_error);   
