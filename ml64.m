@@ -25,6 +25,9 @@ delta_ih=zeros(1,hidden_neurons);
 % ERROR ARRAY
 delta_output=zeros(1,output_neurons);
 
+% DELTA HIDDEN
+delta_hidden = zeros(1,hidden_neurons);
+
 % OUTPUT LAYER DELTA: Difference between expected and calculated
 delta_o=zeros(1,output_neurons);
 
@@ -47,11 +50,11 @@ eta3=0.62;
 alfa=0.1;
 learning_rate=0.69;
 
-activation_output =; 
+activation_output = 0; 
 %*****************************************************Fix this, its an error
 %work with present
 
-current_row = 0;
+current_row = 1;
 total_rows = 525;
 % Training the neural network uses 80% of data
 training_rows = .80 * total_rows;
@@ -60,9 +63,9 @@ training_rows = .80 * total_rows;
 while current_row <= training_rows
 
 	%Load data into temporary input and output arrays
-	for i=1:1:5
+	for i=2:1:5
 		in_vector(1,i-1) = data(current_row, i);
-		out_vector(1, i-1) = data(current_row, (i+5));
+		out_vector(1,i-1) = data(current_row, (i+6));
 	end
 
 	%*********** COMPUTING INPUT FOR HIDDEN LAYER *************
@@ -118,14 +121,13 @@ while current_row <= training_rows
 
 
 	%************* BACKPROPAGATE THE ERRORS***************
-
-	delta_hidden = zeros(1,hidden_neurons);
 	
 	%************Getting Hidden Layer Deltas
 	for k=1:1:hidden_neurons
 		delta_sum = 0;
 		for n=1:1:output_neurons
 			delta_sum = delta_sum + delta_output(1,n) * pw_ho(k,n);
+            fprintf("delta_output: %f\n", delta_output(1,n));
 		end
 		delta_hidden(1,k)= delta_sum;
 	end
@@ -136,7 +138,8 @@ while current_row <= training_rows
 
 	%******Updating Weights between input and hidden layer
 	for k = 1: 1: hidden_neurons
-		for n = 1: 1: input_neurons
+        for n = 1: 1: input_neurons
+            fprintf("delta_hidden(1,n): %f\n", delta_hidden(1,n));
 			next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*diff(1/(1+exp(-1*hide1_neuron_out(1,k) )))*in_vector(1, n);
 		end
 	end
