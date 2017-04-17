@@ -46,127 +46,130 @@ next.theta_o=zeros(1,output_neurons);
 
 learning_rate=.2;
 
-activation_output = 0; 
+activation_output = 0;
+
+amountOfRuns = 10;
 %*****************************************************Fix this, its an error
 %work with present
 
-current_row = 1;
-total_rows = 525;
-% Training the neural network uses 80% of data
-training_rows = .80 * total_rows;
+for runs=1:1:amountOfRuns
+    current_row = 1;
+    total_rows = 525;
+    % Training the neural network uses 80% of data
+    training_rows = .80 * total_rows;
 
-%********** TRAINING LOOP ******************************
-while current_row <= training_rows
+    %********** TRAINING LOOP ******************************
+    while current_row <= training_rows
 
-	%Load data into temporary input and output arrays
-	for i=2:1:6
-		in_vector(1,i-1) = data(current_row, i);
-		out_vector(1,i-1) = data(current_row, (i+5));
-	end
+        %Load data into temporary input and output arrays
+        for i=2:1:6
+            in_vector(1,i-1) = data(current_row, i);
+            out_vector(1,i-1) = data(current_row, (i+5));
+        end
 
-	%*********** COMPUTING INPUT FOR HIDDEN LAYER *************
+        %*********** COMPUTING INPUT FOR HIDDEN LAYER *************
 
-	% Start at 1, step by 1, and end at 5
-	for j=1:1:hidden_neurons
+        % Start at 1, step by 1, and end at 5
+        for j=1:1:hidden_neurons
 
-	   neuron_input=0;
+           neuron_input=0;
 
-	   % Start at 1, step by 1, and end at input_neurons
-	   for i=1:1:input_neurons
+           % Start at 1, step by 1, and end at input_neurons
+           for i=1:1:input_neurons
 
-		   % Multiply the input value by the hidden layer weight
-		   neuron_input = neuron_input+in_vector(1,i)*pw_ih(i,j);
+               % Multiply the input value by the hidden layer weight
+               neuron_input = neuron_input+in_vector(1,i)*pw_ih(i,j);
 
-	   end
+           end
 
-	   % Add the hidden layer theta value
-	   neuron_input= neuron_input+ptheta_h1(j);
+           % Add the hidden layer theta value
+           neuron_input= neuron_input+ptheta_h1(j);
 
-	   % F ACTIVATION FUNCTION
-	   activation_output=1/(1+exp(-1*neuron_input));
-       
-       %SETTING THE OUTPUTS OF THE HIDDEN LAYER
-       hide1_neuron_out(1,j)= activation_output;
+           % F ACTIVATION FUNCTION
+           activation_output=1/(1+exp(-1*neuron_input));
+
+           %SETTING THE OUTPUTS OF THE HIDDEN LAYER
+           hide1_neuron_out(1,j)= activation_output;
+        end
+
+        %********* COMPUTING THE INPUT FOR THE OUTPUT LAYER ************
+
+        % Start at 1, step by 1, end at 5
+        for j=1:1:output_neurons %compute input to output layer
+            neuron_input=0;
+
+            % Start at 1, step by 1, end at # of hidden neurons
+            for i=1:1:hidden_neurons
+
+                % Multiply hidden output by weight
+                neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
+
+            end
+
+            % Add output theta value
+            neuron_input= neuron_input+ptheta_o(j);
+
+            %factivation (same as previous)
+            activation_output=1/(1+exp(-1*neuron_input));
+
+            % Error = desired (y) - calculated (y_a)
+            delta_output(1,j) = out_vector(1,j) - activation_output;
+        end
+
+
+        %************* BACKPROPAGATE THE ERRORS***************
+
+        %************Getting Hidden Layer Deltas
+        for k=1:1:hidden_neurons
+            delta_sum = 0;
+            for n=1:1:output_neurons
+                delta_sum = delta_sum + delta_output(1,n) * pw_ho(k,n);
+            end
+            delta_hidden(1,k)= delta_sum;
+        end
+
+
+        %************Replace diff with symbolic eq*****************
+
+        syms x;
+        f(x) = 1/(1+exp(-1*x));
+        df = diff(f,x);
+
+        %******Updating Weights between input and hidden layer
+        for k = 1: 1: hidden_neurons
+            for n = 1: 1: input_neurons
+                x = hide1_neuron_out(1,k);
+                next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*df(x)*in_vector(1, n);
+            end
+        end
+
+        %******Updating Weights between hidden layer and output
+        %Check this late, throws an error
+        %Subscripted assignment dimension mismatch.
+        x = neuron_input;
+
+        for k = 1: 1: output_neurons
+            for n = 1: 1: hidden_neurons
+                next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*df(x)*hide1_neuron_out(1,n);
+            end
+        end
+
+
+        %******Make the present weights, the Next weights********
+        pw_ih = next.w_ih;
+        pw_oh = next.w_ho;
+
+        % Increment the row
+        current_row = current_row + 1;
+        fprintf('Runs: %d; Row: %d\n', runs, current_row);
     end
-
-	%********* COMPUTING THE INPUT FOR THE OUTPUT LAYER ************
-
-	% Start at 1, step by 1, end at 5
-	for j=1:1:output_neurons %compute input to output layer
-		neuron_input=0;
-
-		% Start at 1, step by 1, end at # of hidden neurons
-		for i=1:1:hidden_neurons
-
-			% Multiply hidden output by weight
-			neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
-
-		end
-
-		% Add output theta value
-		neuron_input= neuron_input+ptheta_o(j);
-
-		%factivation (same as previous)
-		activation_output=1/(1+exp(-1*neuron_input));
-
-		% Error = desired (y) - calculated (y_a)
-		delta_output(1,j) = out_vector(1,j) - activation_output;
-	end
-
-
-	%************* BACKPROPAGATE THE ERRORS***************
-	
-	%************Getting Hidden Layer Deltas
-	for k=1:1:hidden_neurons
-		delta_sum = 0;
-		for n=1:1:output_neurons
-			delta_sum = delta_sum + delta_output(1,n) * pw_ho(k,n);
-		end
-		delta_hidden(1,k)= delta_sum;
-	end
-
-
-	%************Replace diff with symbolic eq*****************
-    
-    syms x;
-    f(x) = 1/(1+exp(-1*x));
-    df = diff(f,x);
-            
-	%******Updating Weights between input and hidden layer
-	for k = 1: 1: hidden_neurons
-        for n = 1: 1: input_neurons
-            x = hide1_neuron_out(1,k);
-			next.w_ih(n, k) = pw_ih(n, k) + learning_rate*delta_hidden(1,n)*df(x)*in_vector(1, n);
-		end
-	end
-
-	%******Updating Weights between hidden layer and output
-	%Check this late, throws an error
-	%Subscripted assignment dimension mismatch.
-    x = neuron_input;
-
-    for k = 1: 1: output_neurons
-		for n = 1: 1: hidden_neurons
-			next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*df(x)*hide1_neuron_out(1,n);
-		end
-	end
-
-	
-	%******Make the present weights, the Next weights********
-	pw_ih = next.w_ih;
-	pw_oh = next.w_ho;
-
-	% Increment the row
-	current_row = current_row + 1;
-	fprintf('%d\n', current_row);
 end
-
 
 % TESTING LOOP
 while current_row < total_rows
 
 	%Load data like before
-	for i=2:1:6
+    for i=2:1:6
 		in_vector(1,i-1) = data(current_row, i);
 		out_vector(1,i-1) = data(current_row, (i+5));
     end
