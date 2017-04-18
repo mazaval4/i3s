@@ -8,19 +8,14 @@ output_neurons=5;   %output neurons
 
 % INPUT, HIDDEN LAYER, and OUTPUT ARRAYS
 in_vector=zeros(1,output_neurons);
-hide1_vector=zeros(1,hidden_neurons);
 out_vector=zeros(1,output_neurons);
 
 % ARRAYS OF RANDOM WEIGHTS BETWEEN EACH LAYER
 w0=randn(input_neurons,hidden_neurons)*0.001;   
 w2=randn(hidden_neurons,output_neurons)*0.001;
 
-
 % HIDDEN LAYER OUTPUT    
 hide1_neuron_out=zeros(1,hidden_neurons);
-
-% HIDDEN LAYER DELTA: Difference between expected and calculated   
-delta_ih=zeros(1,hidden_neurons);
 
 % OUTPUT LAYER DELTA: Difference between expected and calculated
 delta_output=zeros(1,output_neurons);
