@@ -1,5 +1,7 @@
 % Import the database as 2 dimensional array
-data = xlsread('[S2 v2] i3s Database & Results raw - Z.xlsm');
+data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
+imported_data = data;
+data = 0; % This should release the excel file for other programs.
 
 % NEURONS 
 input_neurons=5;    %input neurons
@@ -40,7 +42,7 @@ learning_rate=.2;
 
 activation_output = 0;
 
-noOfIteration = 50;
+noOfIteration = 10;
 %*****************************************************Fix this, its an error
 %work with present
 
@@ -55,8 +57,8 @@ for iteration=1:1:noOfIteration
 
         %Load data into temporary input and output arrays
         for i=2:1:6
-            in_vector(1,i-1) = data(current_row, i);
-            out_vector(1,i-1) = data(current_row, (i+5));
+            in_vector(1,i-1) = imported_data(current_row, i);
+            out_vector(1,i-1) = imported_data(current_row, (i+5));
         end
 
         %*********** COMPUTING INPUT FOR HIDDEN LAYER *************
@@ -162,8 +164,8 @@ while current_row < total_rows
 
 	%Load data like before
     for i=2:1:6
-		in_vector(1,i-1) = data(current_row, i);
-		out_vector(1,i-1) = data(current_row, (i+5));
+		in_vector(1,i-1) = imported_data(current_row, i);
+		out_vector(1,i-1) = imported_data(current_row, (i+5));
     end
 	
 	%******************* TESTING *******************
