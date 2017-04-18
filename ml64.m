@@ -2,9 +2,9 @@
 data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
 
 % NEURONS 
-input_neurons=5;         %input neurons
-hidden_neurons=5;        %first hidden layer neurons
-output_neurons=5;          %output neurons
+input_neurons=5;    %input neurons
+hidden_neurons=5;   %first hidden layer neurons
+output_neurons=5;   %output neurons
 
 % INPUT, HIDDEN LAYER, and OUTPUT ARRAYS
 in_vector=zeros(1,output_neurons);
@@ -22,14 +22,11 @@ hide1_neuron_out=zeros(1,hidden_neurons);
 % HIDDEN LAYER DELTA: Difference between expected and calculated   
 delta_ih=zeros(1,hidden_neurons);
 
-% ERROR ARRAY
+% OUTPUT LAYER DELTA: Difference between expected and calculated
 delta_output=zeros(1,output_neurons);
 
 % DELTA HIDDEN
 delta_hidden = zeros(1,hidden_neurons);
-
-% OUTPUT LAYER DELTA: Difference between expected and calculated
-delta_o=zeros(1,output_neurons);
 
 % PRESENT WEIGHTS (pw)
 pw_ih=randn(input_neurons,hidden_neurons)*0.001;
@@ -48,11 +45,11 @@ learning_rate=.2;
 
 activation_output = 0;
 
-amountOfRuns = 10;
+noOfIteration = 50;
 %*****************************************************Fix this, its an error
 %work with present
 
-for runs=1:1:amountOfRuns
+for iteration=1:1:noOfIteration
     current_row = 1;
     total_rows = 525;
     % Training the neural network uses 80% of data
@@ -161,7 +158,7 @@ for runs=1:1:amountOfRuns
 
         % Increment the row
         current_row = current_row + 1;
-        fprintf('Runs: %d; Row: %d\n', runs, current_row);
+        fprintf('Iteration: %d; Row: %d\n', iteration, current_row);
     end
 end
 
