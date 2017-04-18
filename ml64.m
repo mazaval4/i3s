@@ -1,9 +1,9 @@
 % Import the database as 2 dimensional array
-data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
+data = xlsread('[S2 v2] i3s Database & Results raw - Z.xlsm');
 
 % NEURONS 
 input_neurons=5;    %input neurons
-hidden_neurons=5;   %first hidden layer neurons
+hidden_neurons=15;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
 % INPUT, HIDDEN LAYER, and OUTPUT ARRAYS
@@ -142,7 +142,7 @@ for iteration=1:1:noOfIteration
 
         for k = 1: 1: output_neurons
             for n = 1: 1: hidden_neurons
-                next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,n)*df(x)*hide1_neuron_out(1,n);
+                next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,k)*df(x)*hide1_neuron_out(1,n);
             end
         end
 
