@@ -38,20 +38,26 @@ next.w_ho=zeros(hidden_neurons,output_neurons);
 next.theta_o=zeros(1,output_neurons);
 
 
-learning_rate=.2;
+learning_rate=.5;
 
 activation_output = 0;
 
-noOfIteration = 10;
+noOfIteration = 50;
 %*****************************************************Fix this, its an error
 %work with present
 
-for iteration=1:1:noOfIteration
-    current_row = 1;
-    total_rows = 525;
-    % Training the neural network uses 80% of data
-    training_rows = .80 * total_rows;
+%************Replace diff with symbolic eq*****************
+syms x;
+f(x) = 1/(1+exp(-1*x));
+df = diff(f,x);
 
+current_row = 1;
+total_rows = 525;
+% Training the neural network uses 80% of data
+training_rows = .80 * total_rows;
+
+
+for iteration=1:1:noOfIteration
     %********** TRAINING LOOP ******************************
     while current_row <= training_rows
 
@@ -123,12 +129,7 @@ for iteration=1:1:noOfIteration
         end
 
 
-        %************Replace diff with symbolic eq*****************
-
-        syms x;
-        f(x) = 1/(1+exp(-1*x));
-        df = diff(f,x);
-
+        
         %******Updating Weights between input and hidden layer
         for k = 1: 1: hidden_neurons
             for n = 1: 1: input_neurons
@@ -156,6 +157,8 @@ for iteration=1:1:noOfIteration
         % Increment the row
         current_row = current_row + 1;
         fprintf('Iteration: %d; Row: %d\n', iteration, current_row);
+        %fprintf('   IH-Weights: %d\n', pw_ih);
+        %fprintf('   HO-Weights: %d\n', pw_oh);
     end
 end
 
@@ -237,4 +240,4 @@ end
 % After the testing loop...
 % get the average percent error: the total percent error divided by 1/5th of the 525 total points
 average_percent_error = total_percent_error / 105*5;
-fprintf('Total Percent Error: %0.2f\n', average_percent_error);   
+fprintf('Total Percent Error: %0.2f; Iterations: %d\n', average_percent_error, noOfIteration);   
