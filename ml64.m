@@ -42,7 +42,7 @@ learning_rate=.5;
 
 activation_output = 0;
 
-noOfIteration = 25;
+noOfIteration = 100;
 
 %************Replace diff with symbolic eq*****************
 %I think this comment can be deleted now^^
@@ -50,13 +50,14 @@ syms x;
 f(x) = 1/(1+exp(-1*x));
 df = diff(f,x);
 
-current_row = 1;
 total_rows = 525;
 % Training the neural network uses 80% of data
 training_rows = .80 * total_rows;
 
 
 for iteration=1:1:noOfIteration
+    %Reset current_row for new iteration
+    current_row = 1;
     %********** TRAINING LOOP ******************************
     while current_row <= training_rows
 
