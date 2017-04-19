@@ -8,7 +8,7 @@ input_neurons=5;    %input neurons
 hidden_neurons=15;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
-% INPUT, HIDDEN LAYER, and OUTPUT ARRAYS
+% INPUT and OUTPUT ARRAYS
 in_vector=zeros(1,output_neurons);
 out_vector=zeros(1,output_neurons);
 
@@ -42,11 +42,10 @@ learning_rate=.5;
 
 activation_output = 0;
 
-noOfIteration = 50;
-%*****************************************************Fix this, its an error
-%work with present
+noOfIteration = 25;
 
 %************Replace diff with symbolic eq*****************
+%I think this comment can be deleted now^^
 syms x;
 f(x) = 1/(1+exp(-1*x));
 df = diff(f,x);
@@ -69,7 +68,8 @@ for iteration=1:1:noOfIteration
 
         %*********** COMPUTING INPUT FOR HIDDEN LAYER *************
 
-        % Start at 1, step by 1, and end at 5
+        % Start at 1, step by 1, and end at  the number of hidden neurons
+        % we choose
         for j=1:1:hidden_neurons
 
            neuron_input=0;
@@ -222,6 +222,8 @@ while current_row < total_rows
 		activation_output=1/(1+exp(-1*neuron_input));
 
 		% Error = desired (y) - calculated (y_a)
+        % does something have to be done with this delta output seems as
+        % though we are just setting it and not using it for anything
 		delta_output(1,j)=out_vector(1,j)-activation_output;
 
         if out_vector(1,j) ~= 0
