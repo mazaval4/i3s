@@ -1,7 +1,7 @@
 % Import the database as 2 dimensional array
 data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
-inputData = xlsread('InputData.xlsx');
-outputData = xlsread('OutputData.xlsx');
+inputData = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
+outputData = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
 imported_data = data;
 data = 0; % This should release the excel file for other programs.
 
