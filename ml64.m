@@ -1,21 +1,25 @@
 % Import the database as 2 dimensional array
-data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
+%data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
+data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
 imported_data = data;
 data = 0; % This should release the excel file for other programs.
 
 % NEURONS 
 input_neurons=5;    %input neurons
-hidden_neurons=30;   %first hidden layer neurons
+hidden_neurons=5;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
 
-learning_rate=.50;
+learning_rate=.20;
 
 activation_output = 0;
 
-weight_multiplier = 0.001;
+weight_multiplier = 0.01;
 
-noOfIteration = 1;
+noOfIteration = 10;
+
+variation_array = [10, 50];
+variation_array = [10];
 
 syms x;
 f(x) = 1/(1+exp(-1*x));
@@ -26,9 +30,9 @@ total_rows = 525;
 % Training the neural network uses 80% of data
 training_rows = .80 * total_rows;
 
-for p=0:1:0
+for p=1:1:length(variation_array)
     %Adjust something by p
-	%learning_rate = p;
+	%hidden_neurons = variation_array(p);
 	
     % INPUT and OUTPUT ARRAYS
     in_vector=zeros(1,output_neurons);
@@ -59,12 +63,12 @@ for p=0:1:0
     next.w_ho=zeros(hidden_neurons,output_neurons);
     next.theta_o=zeros(1,output_neurons);
 
+    training_percent_error = 0;
     for iteration=1:1:noOfIteration
 		%Reset current_row for new iteration
 		current_row = 1;
         %********** TRAINING LOOP ******************************
         while current_row <= training_rows
-
             %Load data into temporary input and output arrays
             for i=2:1:6
                 in_vector(1,i-1) = imported_data(current_row, i);
@@ -97,7 +101,6 @@ for p=0:1:0
             end
 
             %********* COMPUTING THE INPUT FOR THE OUTPUT LAYER ************
-
             % Start at 1, step by 1, end at 5
             for j=1:1:output_neurons %compute input to output layer
                 neuron_input=0;
@@ -119,8 +122,7 @@ for p=0:1:0
                 % Error = desired (y) - calculated (y_a)
                 delta_output(1,j) = out_vector(1,j) - activation_output;
             end
-
-
+            
             %************* BACKPROPAGATE THE ERRORS***************
 
             %************Getting Hidden Layer Deltas
@@ -165,9 +167,89 @@ for p=0:1:0
             %fprintf('   HO-Weights: %d\n', pw_oh);
             fprintf('.');
         end
+        fprintf('\n');
     end
+    
+    % FINAL TRAINING ERROR CHECK LOOP 
+    current_row = 1;
+    %********** TRAINING LOOP ******************************
+    while current_row <= training_rows
+        %Load data like before
+        for i=2:1:6
+            in_vector(1,i-1) = imported_data(current_row, i);
+            out_vector(1,i-1) = imported_data(current_row, (i+5));
+        end
 
-    % TESTING LOOP
+        %******************* TESTING TRAINING DATA *******************
+
+        training_percent_error = 0;
+
+        % COMPUTING INPUT FOR HIDDEN LAYER
+
+        % Start at 1, step by 1, and end at 5
+        for j=1:1:hidden_neurons
+
+           neuron_input=0;
+
+           % Start at 1, step by 1, and end at 4
+           for i=1:1:input_neurons
+
+               % Multiply the input value by the hidden layer weight
+               neuron_input = neuron_input+in_vector(1,i)*pw_ih(i,j);
+
+           end
+
+           % Add the hidden layer theta value
+           neuron_input= neuron_input+ptheta_h1(j);
+
+           % F ACTIVATION FUNCTION
+           activation_output=1/(1+exp(-1*neuron_input));
+        end
+
+        % SETTING THE OUTPUTS OF THE HIDDEN LAYER
+
+        hide1_neuron_out(1,j)= activation_output;
+
+        %********* COMPUTING THE INPUT FOR THE OUTPUT LAYER *****
+
+        % Start at 1, step by 1, end at 5
+        for j=1:1:output_neurons %compute input to output layer
+            neuron_input=0;
+
+            % Start at 1, step by 1, end at # of hidden neurons
+            for i=1:1:hidden_neurons
+
+                % Multiply hidden output by weight
+                neuron_input=neuron_input+hide1_neuron_out(1,i)*pw_ho(i,j);
+
+            end
+
+            % Add output theta value
+            neuron_input= neuron_input+ptheta_o(j);
+
+            % activation (same as previous)
+            activation_output=1/(1+exp(-1*neuron_input));
+
+            % Error = desired (y) - calculated (y_a)
+            delta_output(1,j)=out_vector(1,j)-activation_output;
+
+            if out_vector(1,j) ~= 0
+                % percent_error=the absolute value of (calc - desired)/desired *100
+                percent_error = abs( (activation_output - out_vector(1,j) ) / out_vector(1,j) ) * 100;                
+            elseif activation_output ~= 0
+                percent_error = 1;
+            else
+                percent_error = 0;
+            end
+            %fprintf('Percent Error: %0.2f\n', percent_error);
+            training_percent_error = training_percent_error + percent_error;
+        end
+
+        current_row = current_row + 1;
+        %fprintf('%d\n', current_row);
+    end
+     fprintf('\nTraining Percent Error: %0.2f\n', training_percent_error/(training_rows*output_neurons));
+   % TESTING LOOP
     while current_row < total_rows
 
         %Load data like before
@@ -250,5 +332,5 @@ for p=0:1:0
     % After the testing loop...
     % get the average percent error: the total percent error divided by 1/5th of the 525 total points
     average_percent_error = total_percent_error /((output_neurons)*(total_rows-training_rows));
-    fprintf('Total Percent Error: %0.2f; Iterations: %d; Learning rate: %0.2f; Neurons: %d; \n', average_percent_error, noOfIteration, learning_rate, hidden_neurons);   
+    fprintf('\nTotal Percent Error: %0.2f; Iterations: %d; Learning rate: %0.2f; Neurons: %d; weight_multiplier: %0.2f\n', average_percent_error, noOfIteration, learning_rate, hidden_neurons, weight_multiplier);   
 end
