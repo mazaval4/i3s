@@ -1,28 +1,27 @@
 % Import the database as 2 dimensional array
-%data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
-data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
+data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
+%data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
 imported_data = data;
 data = 0; % This should release the excel file for other programs.
 
 % NEURONS 
 input_neurons=5;    %input neurons
-hidden_neurons=5;   %first hidden layer neurons
+hidden_neurons=10;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
 
-learning_rate=.20;
+learning_rate=.50;
 
 activation_output = 0;
 
-weight_multiplier = 0.01;
+weight_multiplier = 0.1;
 
-noOfIteration = 10;
+noOfIteration = 20;
 
-variation_array = [10, 50];
-variation_array = [10];
+variation_array = [0.01, 0.1, 1, 10];
 
 syms x;
-f(x) = 1/(1+exp(-1*x));
+f(x) = 2/(1+exp(-2*x))-1;
 df = diff(f,x);
 
 current_row = 1;
@@ -32,15 +31,11 @@ training_rows = .80 * total_rows;
 
 for p=1:1:length(variation_array)
     %Adjust something by p
-	%hidden_neurons = variation_array(p);
+	weight_multiplier = variation_array(p);
 	
     % INPUT and OUTPUT ARRAYS
     in_vector=zeros(1,output_neurons);
     out_vector=zeros(1,output_neurons);
-
-    % ARRAYS OF RANDOM WEIGHTS BETWEEN EACH LAYER
-    w0=randn(input_neurons,hidden_neurons)*weight_multiplier;   
-    w2=randn(hidden_neurons,output_neurons)*weight_multiplier;
 
     % HIDDEN LAYER OUTPUT    
     hide1_neuron_out=zeros(1,hidden_neurons);
@@ -94,7 +89,8 @@ for p=1:1:length(variation_array)
                neuron_input= neuron_input+ptheta_h1(j);
 
                % F ACTIVATION FUNCTION
-               activation_output=1/(1+exp(-1*neuron_input));
+               x=neuron_input;
+               activation_output=f(x);
 
                %SETTING THE OUTPUTS OF THE HIDDEN LAYER
                hide1_neuron_out(1,j)= activation_output;
@@ -117,7 +113,8 @@ for p=1:1:length(variation_array)
                 neuron_input= neuron_input+ptheta_o(j);
 
                 %factivation (same as previous)
-                activation_output=1/(1+exp(-1*neuron_input));
+                x=neuron_input; 
+                activation_output=f(x);
 
                 % Error = desired (y) - calculated (y_a)
                 delta_output(1,j) = out_vector(1,j) - activation_output;
@@ -145,10 +142,7 @@ for p=1:1:length(variation_array)
             end
 
             %******Updating Weights between hidden layer and output
-            %Check this late, throws an error
-            %Subscripted assignment dimension mismatch.
             x = neuron_input;
-
             for k = 1: 1: output_neurons
                 for n = 1: 1: hidden_neurons
                     next.w_ho(n, k) = pw_ho(n, k) + learning_rate*delta_output(1,k)*df(x)*hide1_neuron_out(1,n);
@@ -158,13 +152,13 @@ for p=1:1:length(variation_array)
 
             %******Make the present weights, the Next weights********
             pw_ih = next.w_ih;
-            pw_oh = next.w_ho;
+            pw_ho = next.w_ho;
 
             % Increment the row
             current_row = current_row + 1;
             %fprintf('Iteration: %d; Row: %d\n', iteration, current_row);
             %fprintf('   IH-Weights: %d\n', pw_ih);
-            %fprintf('   HO-Weights: %d\n', pw_oh);
+            %fprintf('   HO-Weights: %d\n', pw_ho);
             fprintf('.');
         end
         fprintf('\n');
@@ -203,7 +197,8 @@ for p=1:1:length(variation_array)
            neuron_input= neuron_input+ptheta_h1(j);
 
            % F ACTIVATION FUNCTION
-           activation_output=1/(1+exp(-1*neuron_input));
+           x=neuron_input;
+           activation_output=f(x);
         end
 
         % SETTING THE OUTPUTS OF THE HIDDEN LAYER
@@ -228,7 +223,8 @@ for p=1:1:length(variation_array)
             neuron_input= neuron_input+ptheta_o(j);
 
             % activation (same as previous)
-            activation_output=1/(1+exp(-1*neuron_input));
+            x=neuron_input; 
+            activation_output=f(x);
 
             % Error = desired (y) - calculated (y_a)
             delta_output(1,j)=out_vector(1,j)-activation_output;
@@ -281,7 +277,8 @@ for p=1:1:length(variation_array)
            neuron_input= neuron_input+ptheta_h1(j);
 
            % F ACTIVATION FUNCTION
-           activation_output=1/(1+exp(-1*neuron_input));
+           x=neuron_input; 
+           activation_output=f(x);
         end
 
         % SETTING THE OUTPUTS OF THE HIDDEN LAYER
@@ -306,7 +303,8 @@ for p=1:1:length(variation_array)
             neuron_input= neuron_input+ptheta_o(j);
 
             % activation (same as previous)
-            activation_output=1/(1+exp(-1*neuron_input));
+            x=neuron_input; 
+            activation_output=f(x);
 
             % Error = desired (y) - calculated (y_a)
             delta_output(1,j)=out_vector(1,j)-activation_output;
@@ -333,4 +331,8 @@ for p=1:1:length(variation_array)
     % get the average percent error: the total percent error divided by 1/5th of the 525 total points
     average_percent_error = total_percent_error /((output_neurons)*(total_rows-training_rows));
     fprintf('\nTotal Percent Error: %0.2f; Iterations: %d; Learning rate: %0.2f; Neurons: %d; weight_multiplier: %0.2f\n', average_percent_error, noOfIteration, learning_rate, hidden_neurons, weight_multiplier);   
+    fprintf('Weights: ih:\n');
+    disp(pw_ih);
+    fprintf('ho:\n');
+    disp(pw_ho);
 end
