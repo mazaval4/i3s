@@ -1,29 +1,29 @@
 % Import the database as 2 dimensional array
 %inputData = xlsread('InputData.xlsx');
 %outputData = xlsread('OutputData.xlsx');
-data = xlsread('[S2 v2] i3s Database & Results Z-scored - Copy.xlsm');
+data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
 %data = xlsread('[S2 v2] i3s Database & Results raw - Copy.xlsm');
 imported_data = data;
 data = 0; % This should release the excel file for other programs.
 
 % NEURONS 
 input_neurons=5;    %input neurons
-hidden_neurons=5;   %first hidden layer neurons
+hidden_neurons=10;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
 
-learning_rate=.50;
+learning_rate=.10;
 
 activation_output = 0;
 
 weight_multiplier = 0.1;
 
-noOfIteration = 5;
+noOfIteration = 10;
 
-variation_array = [5, 10, 20];
+variation_array = [0.6, 0.7, 0.8, 0.9, 0.01, 0.2, 0.3, 0.4];
 
 syms x;
-f(x) = (sqrt((x^2)+1)-1)/2+x;
+f(x) = x/(1+abs(x));
 df = diff(f,x);
 
 current_row = 1;
@@ -88,11 +88,11 @@ for p=1:1:length(variation_array)
                end
 
                % Add the hidden layer theta value
-               neuron_input= neuron_input+ptheta_h1(j);
+               neuron_input= neuron_input-ptheta_h1(j);
 
-               % F ACTIVATION FUNCTION
+               % F ACTIVATION FUNCTION   
                x=neuron_input;
-               activation_output=f(x);
+               activation_output=subs(f);
 
                %SETTING THE OUTPUTS OF THE HIDDEN LAYER
                hide1_neuron_out(1,j)= activation_output;
@@ -112,14 +112,14 @@ for p=1:1:length(variation_array)
                 end
 
                 % Add output theta value
-                neuron_input= neuron_input+ptheta_o(j);
+                neuron_input= neuron_input-ptheta_o(j);
 
                 %factivation (same as previous)
                 x=neuron_input; 
-                activation_output=f(x);
+                activation_output=subs(f);
 
-                % Error = desired (y) - calculated (y_a)
-                delta_output(1,j) = out_vector(1,j) - activation_output;
+                % Error = - desired (y) + calculated (y_a)
+                delta_output(1,j) = - out_vector(1,j) + activation_output;
             end
             
             %************* BACKPROPAGATE THE ERRORS***************
@@ -152,16 +152,25 @@ for p=1:1:length(variation_array)
             end
 
 
-            %******Make the present weights, the Next weights********
-            pw_ih = next.w_ih;
-            pw_ho = next.w_ho;
-
+             %******Make the present weights, the Next weights********
+            %These weights produce the best results when only one is
+            %uncommented
+            %pw_ih = next.w_ih;
+            %pw_ho = next.w_ho;
+            
+            %Alternate updating weights
+            if mod(current_row, 2) == 0
+                pw_ih = next.w_ih;
+            else
+                pw_ho = next.w_ho;
+            end
+            
             % Increment the row
             current_row = current_row + 1;
             %fprintf('Iteration: %d; Row: %d\n', iteration, current_row);
             %fprintf('   IH-Weights: %d\n', pw_ih);
             %fprintf('   HO-Weights: %d\n', pw_ho);
-            fprintf('.');
+            fprintf ('.');
         end
         fprintf('\n');
     end
@@ -196,11 +205,11 @@ for p=1:1:length(variation_array)
            end
 
            % Add the hidden layer theta value
-           neuron_input= neuron_input+ptheta_h1(j);
+           neuron_input= neuron_input-ptheta_h1(j);
 
            % F ACTIVATION FUNCTION
            x=neuron_input;
-           activation_output=f(x);
+           activation_output=subs(f);
         end
 
         % SETTING THE OUTPUTS OF THE HIDDEN LAYER
@@ -222,11 +231,11 @@ for p=1:1:length(variation_array)
             end
 
             % Add output theta value
-            neuron_input= neuron_input+ptheta_o(j);
+            neuron_input= neuron_input-ptheta_o(j);
 
             % activation (same as previous)
             x=neuron_input; 
-            activation_output=f(x);
+            activation_output=subs(f);
 
             % Error = desired (y) - calculated (y_a)
             delta_output(1,j)=out_vector(1,j)-activation_output;
@@ -276,11 +285,11 @@ for p=1:1:length(variation_array)
            end
 
            % Add the hidden layer theta value
-           neuron_input= neuron_input+ptheta_h1(j);
+           neuron_input= neuron_input-ptheta_h1(j);
 
            % F ACTIVATION FUNCTION
            x=neuron_input; 
-           activation_output=f(x);
+           activation_output=subs(f);
         end
 
         % SETTING THE OUTPUTS OF THE HIDDEN LAYER
@@ -302,11 +311,11 @@ for p=1:1:length(variation_array)
             end
 
             % Add output theta value
-            neuron_input= neuron_input+ptheta_o(j);
+            neuron_input= neuron_input-ptheta_o(j);
 
             % activation (same as previous)
             x=neuron_input; 
-            activation_output=f(x);
+            activation_output=subs(f);
 
             % Error = desired (y) - calculated (y_a)
             delta_output(1,j)=out_vector(1,j)-activation_output;

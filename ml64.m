@@ -14,11 +14,11 @@ learning_rate=.50;
 
 activation_output = 0;
 
-weight_multiplier = 0.1;
+weight_multiplier = 1;
 
 noOfIteration = 20;
 
-variation_array = [0.01, 0.1, 1, 10];
+variation_array = [.50, 0.2, .50, 0.2, .50];
 
 syms x;
 f(x) = 2/(1+exp(-2*x))-1;
@@ -31,7 +31,7 @@ training_rows = .80 * total_rows;
 
 for p=1:1:length(variation_array)
     %Adjust something by p
-	weight_multiplier = variation_array(p);
+	learning_rate = variation_array(p);
 	
     % INPUT and OUTPUT ARRAYS
     in_vector=zeros(1,output_neurons);
@@ -151,8 +151,18 @@ for p=1:1:length(variation_array)
 
 
             %******Make the present weights, the Next weights********
-            pw_ih = next.w_ih;
-            pw_ho = next.w_ho;
+            %These weights produce the best results when only one is
+            %uncommented
+            %pw_ih = next.w_ih;
+            %pw_ho = next.w_ho;
+            
+            %Alternate updating weights
+            if mod(current_row, 2) == 0
+                pw_ih = next.w_ih;
+            else
+                pw_ho = next.w_ho;
+            end
+            
 
             % Increment the row
             current_row = current_row + 1;
