@@ -1,12 +1,13 @@
 % Import the database as 2 dimensional array
+system('taskkill /F /IM EXCEL.EXE');
 data = xlsread('[S2 v2] i3s Database & Results Z-scored.xlsm');
 %data = xlsread('[S2 v2] i3s Database & Results raw.xlsm');
 imported_data = data;
-data = 0; % This should release the excel file for other programs.
+%data = 0; % This should release the excel file for other programs.
 
 % NEURONS 
 input_neurons=5;    %input neurons
-hidden_neurons=10;   %first hidden layer neurons
+hidden_neurons=6;   %first hidden layer neurons
 output_neurons=5;   %output neurons
 
 
@@ -16,9 +17,9 @@ activation_output = 0;
 
 weight_multiplier = 1;
 
-noOfIteration = 20;
+noOfIteration = 1;
 
-variation_array = [.50, 0.2, .50, 0.2, .50];
+variation_array = [.50];
 
 syms x;
 f(x) = 2/(1+exp(-2*x))-1;
@@ -28,6 +29,7 @@ current_row = 1;
 total_rows = 525;
 % Training the neural network uses 80% of data
 training_rows = .80 * total_rows;
+training_x_plot = 1:1:training_rows;
 
 for p=1:1:length(variation_array)
     %Adjust something by p
@@ -62,8 +64,12 @@ for p=1:1:length(variation_array)
     for iteration=1:1:noOfIteration
 		%Reset current_row for new iteration
 		current_row = 1;
+        figure;
+        hold on;
+        weights_old=plot(0,0);
         %********** TRAINING LOOP ******************************
         while current_row <= training_rows
+            
             %Load data into temporary input and output arrays
             for i=2:1:6
                 in_vector(1,i-1) = imported_data(current_row, i);
@@ -153,16 +159,21 @@ for p=1:1:length(variation_array)
             %******Make the present weights, the Next weights********
             %These weights produce the best results when only one is
             %uncommented
-            %pw_ih = next.w_ih;
+            pw_ih = next.w_ih;
             %pw_ho = next.w_ho;
             
             %Alternate updating weights
-            if mod(current_row, 2) == 0
-                pw_ih = next.w_ih;
-            else
-                pw_ho = next.w_ho;
-            end
+%             if mod(current_row, 2) == 0
+%                 pw_ih = next.w_ih;
+%             else
+%                 pw_ho = next.w_ho;
+%             end
             
+            weights=plot(pw_ih.', pw_ho);
+            %weights=plot(training_x_plot(1:current_row), det(pw_ih));
+            delete(weights_old);
+            weights_old=weights;
+            drawnow;
 
             % Increment the row
             current_row = current_row + 1;
@@ -250,7 +261,7 @@ for p=1:1:length(variation_array)
             %fprintf('Percent Error: %0.2f\n', percent_error);
             training_percent_error = training_percent_error + percent_error;
         end
-
+        
         current_row = current_row + 1;
         %fprintf('%d\n', current_row);
     end
